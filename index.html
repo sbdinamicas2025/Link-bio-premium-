@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SB Dinámicas - Link Bio Premium</title>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --primary-red: #d31d24;
+      --dark-red: #8b0000;
+      --pure-white: #ffffff;
+      --off-white: #f8f9fa;
+      --glass-white: rgba(255, 255, 255, 0.9);
+      --text-dark: #1a1a1a;
+      --shadow: 0 15px 35px rgba(0,0,0,0.15);
+      --border-light: rgba(211, 29, 36, 0.1);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #fdfdfd 0%, #ffebee 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dark);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--glass-white);
+      border: 1px solid var(--pure-white);
+      backdrop-filter: blur(10px);
+      border-radius: 32px;
+      padding: 35px;
+      box-shadow: var(--shadow);
+      position: relative;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo-container { 
+      text-align: center; 
+      margin-bottom: 30px; 
+    }
+
+    .logo-wrapper {
+      display: inline-block;
+      padding: 10px;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(211, 29, 36, 0.1);
+    }
+
+    .logo {
+      max-width: 280px;
+      height: auto;
+      display: block;
+    }
+
+    /* ================== CAMBIO ÚNICO: LOGO CIRCULAR PREMIUM ================== */
+    .logo-wrapper.logo-circle{
+      width: 170px;
+      height: 170px;
+      padding: 10px;
+      border-radius: 999px;
+      background: #ffffff;
+
+      /* Borde rojo premium */
+      border: 4px solid var(--primary-red);
+
+      /* Sombras pro */
+      box-shadow:
+        0 12px 25px rgba(211, 29, 36, 0.20),
+        0 3px 10px rgba(0, 0, 0, 0.08);
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo.logo-circle-img{
+      width: 145px;
+      height: 145px;
+      border-radius: 999px;
+      object-fit: cover;
+      display: block;
+
+      /* borde interno suave para que se vea más fino */
+      border: 3px solid #ffffff;
+    }
+    /* ======================================================================== */
+
+    .progress-section {
+      background: var(--off-white);
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 25px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .progress-label {
+      font-weight: 700;
+      color: var(--primary-red);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .progress-bar-container {
+      background: #e9ecef;
+      height: 12px;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary-red), var(--dark-red));
+      border-radius: 10px;
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: var(--pure-white);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary-red);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      margin-top: 5px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 18px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-app {
+      background: var(--primary-red);
+      color: white;
+      box-shadow: 0 4px 15px rgba(211, 29, 36, 0.3);
+    }
+
+    .btn-pay {
+      background: linear-gradient(135deg, #9333ea 0%, #c084fc 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-pay::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-pay:hover::before {
+      left: 100%;
+    }
+
+    .btn-instagram {
+      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(220, 39, 67, 0.3);
+    }
+
+    .btn-whatsapp {
+      background-color: #25d366;
+      color: white;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .hint {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      margin-top: 10px;
+    }
+
+    .btn-icon { font-size: 18px; }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: modalSlide 0.3s ease-out;
+    }
+
+    @keyframes modalSlide {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary-red);
+    }
+
+    .close-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      color: #666;
+      transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+      background: #e2e8f0;
+      transform: rotate(90deg);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #666;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 15px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-red);
+      box-shadow: 0 0 0 3px rgba(211, 29, 36, 0.1);
+    }
+
+    .price-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .price-option {
+      padding: 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .price-option:hover {
+      border-color: var(--primary-red);
+      background: #fff5f5;
+    }
+
+    .price-option.selected {
+      border-color: var(--primary-red);
+      background: var(--primary-red);
+      color: white;
+    }
+
+    .price-value {
+      font-size: 20px;
+      font-weight: 800;
+      display: block;
+    }
+
+    .price-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      margin-top: 4px;
+      opacity: 0.8;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(90deg, var(--primary-red), var(--dark-red));
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(211, 29, 36, 0.3);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .precio-display {
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      color: white;
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    
+    <div class="logo-container">
+      <!-- CAMBIO ÚNICO: logo circular, fondo blanco, borde rojo, archivo local -->
+      <div class="logo-wrapper logo-circle">
+        <img src="./logo-sb.png" 
+             alt="SB Dinámicas" 
+             class="logo logo-circle-img">
+      </div>
+      <div class="hint" id="estado-firebase">Cargando datos...</div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-header">
+        <span class="progress-label">Cupos Vendidos</span>
+        <span style="font-weight: 800; color: #333;" id="ventas-info">0 / 100</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <span class="stat-number" id="numeros-vendidos">0</span>
+        <span class="stat-label">Vendidos</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="numeros-disponibles">100</span>
+        <span class="stat-label">Libres</span>
+      </div>
+    </div>
+
+    <button onclick="abrirModalPago()" class="btn btn-pay">
+      <span class="btn-icon">💳</span>
+      <span>Comprar Números</span>
+    </button>
+
+    <a href="https://sbdinamicas100.vercel.app" class="btn btn-app">
+      <span class="btn-icon">📱</span>
+      <span>Entrar a la App</span>
+    </a>
+
+    <a href="https://www.instagram.com/sbdinamicas?igsh=YTZvYWVwajM1eWg4" class="btn btn-instagram" target="_blank">
+      <span class="btn-icon">📸</span>
+      <span>Síguenos en Instagram</span>
+    </a>
+
+    <a href="https://chat.whatsapp.com/FAu1gnqVsD33KM6rGImoW0" class="btn btn-whatsapp" target="_blank">
+      <span class="btn-icon">💬</span>
+      <span>Grupo de WhatsApp</span>
+    </a>
+
+    <p class="hint">© 2026 SB Dinámicas - Calidad Premium</p>
+  </div>
+
+  <div id="modalPago" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Compra Rápida</h2>
+        <button class="close-btn" onclick="cerrarModal()">✕</button>
+      </div>
+
+      <div id="precioPorNumero" class="precio-display">
+        Precio por número: Cargando...
+      </div>
+
+      <form id="formCompra" onsubmit="procesarCompra(event)">
+        <div class="form-group">
+          <label class="form-label">Tu Nombre</label>
+          <input type="text" class="form-input" id="inputNombre" placeholder="Ej: Juan Pérez" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Celular (WhatsApp)</label>
+          <input type="tel" class="form-input" id="inputCelular" placeholder="300 123 4567" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ciudad</label>
+          <input type="text" class="form-input" id="inputCiudad" placeholder="Ej: Bogotá" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Cuántos números quieres?</label>
+          <div class="price-selector" id="priceSelector">
+            <!-- Se genera dinámicamente -->
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="btnSubmit">
+          Ir a Pagar con Nequi
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBj4J3ZsJZyp8KKnysRyYQkJ7CllrCw4Uk",
+      authDomain: "sb-dinamicas.firebaseapp.com",
+      projectId: "sb-dinamicas",
+      storageBucket: "sb-dinamicas.firebasestorage.app",
+      messagingSenderId: "1058846798988",
+      appId: "1:1058846798988:web:e27b59f99b30bcf98977a9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 🔥 Conectar con la misma DB de la app de rifas
+    const rifaRef = doc(db, "rifas", "dinamica_flash");
+    
+    let precioNumero = 50000; // Valor por defecto
+    let numerosVendidos = 0;
+    let numerosDisponibles = 100;
+
+    // 📊 Escuchar cambios en tiempo real desde la app
+    onSnapshot(rifaRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        
+        // Obtener precio de la app
+        if (data.config && data.config.value) {
+          precioNumero = parseInt(data.config.value);
+          actualizarPreciosEnModal();
+        }
+        
+        // Contar números vendidos (state === 3)
+        if (data.data) {
+          numerosVendidos = data.data.filter(item => item.state === 3).length;
+          numerosDisponibles = 100 - numerosVendidos;
+          
+          // Actualizar UI
+          document.getElementById('ventas-info').textContent = `${numerosVendidos} / 100`;
+          document.getElementById('numeros-vendidos').textContent = numerosVendidos;
+          document.getElementById('numeros-disponibles').textContent = numerosDisponibles;
+          
+          const porcentaje = Math.round((numerosVendidos / 100) * 100);
+          document.getElementById('progress-bar').style.width = `${porcentaje}%`;
+          
+          document.getElementById('estado-firebase').textContent = "Conectado en vivo ✓";
+          document.getElementById('estado-firebase').style.color = "#10b981";
+        }
+      }
+    }, (error) => {
+      console.error("Error al conectar:", error);
+      document.getElementById('estado-firebase').textContent = "Error de conexión";
+      document.getElementById('estado-firebase').style.color = "#ef4444";
+    });
+
+    function actualizarPreciosEnModal() {
+      const formateado = `$${precioNumero.toLocaleString('es-CO')}`;
+      document.getElementById('precioPorNumero').textContent = `Precio por número: ${formateado}`;
+      
+      // Actualizar opciones de cantidad
+      const selector = document.getElementById('priceSelector');
+      selector.innerHTML = `
+        <div class="price-option" onclick="seleccionarPrecio(1, ${precioNumero})">
+          <span class="price-value">1</span>
+          <span class="price-label">$${precioNumero.toLocaleString('es-CO')}</span>
+        </div>
+        <div class="price-option" onclick="seleccionarPrecio(2, ${precioNumero * 2})">
+          <span class="price-value">2</span>
+          <span class="price-label">$${(precioNumero * 2).toLocaleString('es-CO')}</span>
+        </div>
+        <div class="price-option" onclick="seleccionarPrecio(3, ${precioNumero * 3})">
+          <span class="price-value">3</span>
+          <span class="price-label">$${(precioNumero * 3).toLocaleString('es-CO')}</span>
+        </div>
+        <div class="price-option" onclick="seleccionarPrecio(5, ${precioNumero * 5})">
+          <span class="price-value">5</span>
+          <span class="price-label">$${(precioNumero * 5).toLocaleString('es-CO')}</span>
+        </div>
+      `;
+    }
+
+    window.abrirModalPago = () => {
+      document.getElementById('modalPago').classList.add('active');
+      actualizarPreciosEnModal();
+    };
+
+    window.cerrarModal = () => {
+      document.getElementById('modalPago').classList.remove('active');
+      document.getElementById('formCompra').reset();
+      const opciones = document.querySelectorAll('.price-option');
+      opciones.forEach(op => op.classList.remove('selected'));
+      window.cantidadSeleccionada = 0;
+      window.montoSeleccionado = 0;
+    };
+
+    window.seleccionarPrecio = (cantidad, monto) => {
+      window.cantidadSeleccionada = cantidad;
+      window.montoSeleccionado = monto;
+      
+      const opciones = document.querySelectorAll('.price-option');
+      opciones.forEach(op => op.classList.remove('selected'));
+      event.currentTarget.classList.add('selected');
+    };
+
+    window.procesarCompra = (event) => {
+      event.preventDefault();
+      
+      if (!window.cantidadSeleccionada || window.cantidadSeleccionada === 0) {
+        alert('Por favor selecciona la cantidad de números');
+        return;
+      }
+
+      const nombre = document.getElementById('inputNombre').value.trim();
+      const celular = document.getElementById('inputCelular').value.trim();
+      const ciudad = document.getElementById('inputCiudad').value.trim();
+      
+      // Validaciones
+      if (!nombre || nombre.length < 3) {
+        alert('Por favor ingresa un nombre válido');
+        return;
+      }
+      
+      if (!celular || celular.length < 10) {
+        alert('Por favor ingresa un celular válido');
+        return;
+      }
+      
+      if (!ciudad || ciudad.length < 3) {
+        alert('Por favor ingresa una ciudad válida');
+        return;
+      }
+      
+      // Generar números aleatorios disponibles
+      const numerosAleatorios = [];
+      for (let i = 0; i < window.cantidadSeleccionada; i++) {
+        numerosAleatorios.push(Math.floor(Math.random() * 100).toString().padStart(2, '0'));
+      }
+      const numeros = numerosAleatorios.join(', ');
+
+      const id = 'SB-' + Date.now().toString(36).toUpperCase();
+
+      const params = new URLSearchParams({
+        monto: window.montoSeleccionado,
+        numeros: numeros,
+        nombre: nombre,
+        celular: celular,
+        ciudad: ciudad,
+        id: id,
+        cantidad: window.cantidadSeleccionada
+      });
+
+      console.log('✅ Redirigiendo a pasarela con datos:', Object.fromEntries(params));
+      window.location.href = `pago-nequi.html?${params.toString()}`;
+    };
+
+    document.getElementById('modalPago').addEventListener('click', function(e) {
+      if (e.target === this) {
+        cerrarModal();
+      }
+    });
+
+    // Inicializar precios al cargar
+    actualizarPreciosEnModal();
+  </script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pago Nequi | SB DINÁMICAS</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --primary-red: #d31d24;
+      --dark-red: #8b0000;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #fdfdfd 0%, #ffebee 100%);
+      color: #1a1a1a;
+      margin: 0;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(211, 29, 36, 0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .qr-animate {
+      animation: pulse 3s infinite ease-in-out;
+      border: 4px solid white;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    .copy-toast {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      transform: translateX(-50%) translateY(10px);
+    }
+    .copy-toast.show {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .status-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .status-pending { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+    .status-paid { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+
+    .countdown {
+      font-size: 14px;
+      font-weight: 700;
+      color: #d97706;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .countdown.urgent {
+      animation: blink 1s infinite;
+      color: #dc2626;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex justify-center px-4 py-6 md:py-10">
+
+<div class="w-full max-w-md space-y-6">
+
+  <div class="glass rounded-3xl p-6 text-center relative border-t-4 border-[#d31d24]">
+    <div id="statusBadge" class="status-badge status-pending">PENDIENTE</div>
+    
+    <h1 class="text-3xl font-extrabold italic tracking-tighter text-[#1a1a1a]">
+      SB <span class="text-[#d31d24]">DINÁMICAS</span>
+    </h1>
+    <p class="text-[10px] uppercase tracking-[3px] text-gray-500 font-bold mt-2">
+      Pasarela de Pago Oficial
+    </p>
+    
+    <div id="countdown" class="countdown">
+      ⏱️ Completa tu pago en: <span id="timer">15:00</span>
+    </div>
+    
+    <div class="mt-4 text-left bg-gray-50 p-4 rounded-2xl border border-gray-100">
+      <div class="grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <p class="text-gray-400 text-[10px] uppercase font-bold">Cliente:</p>
+          <p id="clienteNombre" class="font-bold text-gray-800">Cargando...</p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-[10px] uppercase font-bold">Total a Pagar:</p>
+          <p id="montoTotal" class="font-black text-[#d31d24]">$0</p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-[10px] uppercase font-bold">Cantidad:</p>
+          <p id="cantidadNumeros" class="font-bold text-gray-800">0 números</p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-[10px] uppercase font-bold">Celular:</p>
+          <p id="clienteCelular" class="font-bold text-gray-800">-</p>
+        </div>
+        <div class="col-span-2">
+          <p class="text-gray-400 text-[10px] uppercase font-bold">Ciudad:</p>
+          <p id="clienteCiudad" class="font-bold text-gray-800">-</p>
+        </div>
+        <div class="col-span-2">
+          <p class="text-gray-400 text-[10px] uppercase font-bold">ID Reserva:</p>
+          <p id="reservaId" class="font-mono text-xs text-gray-600">-</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-3">
+      <p class="text-xs text-blue-700 font-semibold">
+        <i class="fas fa-info-circle mr-1"></i>
+        <span id="infoNumeros">Tus números serán confirmados después del pago</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="glass rounded-3xl p-8 text-center relative overflow-hidden">
+    <h2 class="font-bold mb-6 flex justify-center items-center gap-2 text-gray-700">
+      <i class="fa-solid fa-qrcode text-[#d31d24]"></i>
+      PAGO POR NEQUI
+    </h2>
+
+    <div class="mb-6 p-5 bg-red-50 rounded-2xl border border-red-100">
+      <p class="text-[11px] text-[#d31d24] uppercase font-black mb-1">Monto exacto a transferir</p>
+      <p id="montoDisplay" class="text-4xl font-black text-gray-900">$0</p>
+    </div>
+
+    <div class="bg-white p-3 rounded-2xl inline-block qr-animate mb-4">
+      <div id="qrcode" class="flex items-center justify-center"></div>
+    </div>
+
+    <div class="mt-4 space-y-1">
+      <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Titular de la cuenta</p>
+      <p class="text-lg font-bold text-gray-800 uppercase">SB DINÁMICAS</p>
+    </div>
+
+    <div class="mt-6 p-4 bg-white rounded-2xl border border-gray-200 cursor-pointer hover:border-[#d31d24] active:scale-95 transition group" onclick="copyNumber()">
+      <p class="text-[10px] text-gray-400 uppercase font-bold mb-1 group-hover:text-[#d31d24]">Toca el número para copiar</p>
+      <div class="flex justify-center items-center gap-3">
+        <span id="nequiNumber" class="text-2xl font-black tracking-widest text-gray-900">318 340 6852</span>
+        <i class="fa-regular fa-copy text-[#d31d24]"></i>
+      </div>
+    </div>
+    
+    <div id="toast" class="copy-toast absolute bottom-4 left-1/2 bg-gray-800 text-white text-[10px] px-6 py-2 rounded-full font-bold shadow-lg">
+      ¡NÚMERO COPIADO!
+    </div>
+  </div>
+
+  <div class="glass rounded-2xl p-6 space-y-4 border-l-4 border-[#d31d24]">
+    <div class="flex items-start gap-4">
+      <div class="bg-red-100 text-[#d31d24] w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">1</div>
+      <p class="text-sm pt-0.5 text-gray-600">Paga el monto de <b class="text-gray-900" id="montoInstruccion">$0</b> vía Nequi.</p>
+    </div>
+    <div class="flex items-start gap-4">
+      <div class="bg-red-100 text-[#d31d24] w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">2</div>
+      <p class="text-sm pt-0.5 text-gray-600">Toma una captura del comprobante.</p>
+    </div>
+    <div class="flex items-start gap-4">
+      <div class="bg-red-100 text-[#d31d24] w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">3</div>
+      <p class="text-sm pt-0.5 text-gray-600">Envía la imagen para confirmar.</p>
+    </div>
+  </div>
+
+  <div class="pt-2">
+    <a id="whatsappBtn" href="#" target="_blank"
+      class="block w-full text-center py-5 rounded-2xl font-black text-white bg-[#25d366] shadow-xl shadow-green-100 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-wider">
+      <i class="fa-brands fa-whatsapp text-xl mr-2"></i>
+      Enviar Comprobante
+    </a>
+  </div>
+
+  <div class="text-center pb-10 mt-6">
+    <a href="index.html" class="text-gray-400 hover:text-[#d31d24] transition text-[10px] font-bold uppercase tracking-widest">
+      <i class="fa-solid fa-arrow-left mr-1"></i> Regresar al Link Bio
+    </a>
+  </div>
+
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBj4J3ZsJZyp8KKnysRyYQkJ7CllrCw4Uk",
+    authDomain: "sb-dinamicas.firebaseapp.com",
+    projectId: "sb-dinamicas",
+    storageBucket: "sb-dinamicas.firebasestorage.app",
+    messagingSenderId: "1058846798988",
+    appId: "1:1058846798988:web:e27b59f99b30bcf98977a9"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const rifaRef = doc(db, "rifas", "dinamica_flash");
+  
+  const NEQUI_NUMBER = "3183406852";
+  const WHATSAPP_ADMIN = "573215714548";
+  
+  let reservaData = null;
+  let timeLeft = 900;
+  let timerInterval = null;
+
+  function cargarDatosReserva() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    reservaData = {
+      monto: parseInt(urlParams.get('monto')) || 0,
+      nombre: decodeURIComponent(urlParams.get('nombre') || ''),
+      id: urlParams.get('id') || 'SB-' + Date.now().toString(36).toUpperCase(),
+      celular: urlParams.get('celular') || '',
+      ciudad: decodeURIComponent(urlParams.get('ciudad') || ''),
+      cantidad: parseInt(urlParams.get('cantidad')) || 0,
+      timestamp: Date.now(),
+      estado: 'pendiente'
+    };
+
+    if (reservaData.monto > 0 && reservaData.nombre) {
+      actualizarInterfaz();
+      generarQR(reservaData.monto);
+      actualizarWhatsApp();
+      guardarReservaFirebase();
+      iniciarTemporizador();
+      escucharEstado();
+    } else {
+      mostrarError();
+    }
+  }
+
+  function mostrarError() {
+    document.getElementById('clienteNombre').textContent = 'Error';
+    document.getElementById('montoTotal').textContent = '$0';
+    document.getElementById('infoNumeros').innerHTML = 
+      '<i class="fas fa-exclamation-triangle mr-1"></i> Error al cargar datos. Vuelve a intentar desde el Link Bio o la App.';
+  }
+
+  async function guardarReservaFirebase() {
+    try {
+      await setDoc(doc(db, "reservas", reservaData.id), {
+        nombre: reservaData.nombre,
+        celular: reservaData.celular,
+        ciudad: reservaData.ciudad,
+        monto: reservaData.monto,
+        cantidad: reservaData.cantidad,
+        id: reservaData.id,
+        estado: 'pendiente',
+        createdAt: new Date().toISOString(),
+        timestamp: Date.now(),
+        source: 'pasarela_unificada'
+      });
+      
+      console.log('✅ Reserva guardada en Firebase');
+    } catch (error) {
+      console.error('❌ Error guardando reserva:', error);
+    }
+  }
+
+  function escucharEstado() {
+    const reservaRef = doc(db, "reservas", reservaData.id);
+    onSnapshot(reservaRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        if (data.estado === 'pagado' || data.estado === 'confirmado') {
+          document.getElementById('statusBadge').textContent = 'PAGADO ✓';
+          document.getElementById('statusBadge').className = 'status-badge status-paid';
+          clearInterval(timerInterval);
+          document.getElementById('countdown').innerHTML = '✅ <strong>¡Pago Confirmado!</strong>';
+          document.getElementById('countdown').className = 'countdown';
+        }
+      }
+    });
+  }
+
+  function iniciarTemporizador() {
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      
+      const minutos = Math.floor(timeLeft / 60);
+      const segundos = timeLeft % 60;
+      const display = `${minutos}:${segundos.toString().padStart(2, '0')}`;
+      
+      document.getElementById('timer').textContent = display;
+      
+      if (timeLeft <= 120) {
+        document.getElementById('countdown').classList.add('urgent');
+      }
+      
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById('countdown').innerHTML = '⚠️ <strong>Tiempo expirado. Vuelve a reservar.</strong>';
+      }
+    }, 1000);
+  }
+
+  function actualizarInterfaz() {
+    document.getElementById('clienteNombre').textContent = reservaData.nombre;
+    document.getElementById('montoTotal').textContent = `$${reservaData.monto.toLocaleString('es-CO')}`;
+    document.getElementById('montoDisplay').textContent = `$${reservaData.monto.toLocaleString('es-CO')}`;
+    document.getElementById('montoInstruccion').textContent = `$${reservaData.monto.toLocaleString('es-CO')}`;
+    document.getElementById('clienteCelular').textContent = reservaData.celular;
+    document.getElementById('clienteCiudad').textContent = reservaData.ciudad;
+    document.getElementById('reservaId').textContent = reservaData.id;
+    document.getElementById('cantidadNumeros').textContent = `${reservaData.cantidad} número${reservaData.cantidad > 1 ? 's' : ''}`;
+    
+    // Mensaje informativo según la cantidad
+    if (reservaData.cantidad > 0) {
+      document.getElementById('infoNumeros').innerHTML = 
+        `<i class="fas fa-check-circle mr-1"></i> Has reservado ${reservaData.cantidad} número${reservaData.cantidad > 1 ? 's' : ''}. Te confirmaremos cuáles son después del pago.`;
+    }
+  }
+
+  function generarQR(monto) {
+    const qrContainer = document.getElementById('qrcode');
+    qrContainer.innerHTML = '';
+    new QRCode(qrContainer, {
+      text: `nequi://pay?phone=${NEQUI_NUMBER}&amount=${monto}`,
+      width: 200,
+      height: 200,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  function actualizarWhatsApp() {
+    const msj = `✅ PAGO NEQUI - SB DINÁMICAS\n\n` +
+                `📋 ID: ${reservaData.id}\n` +
+                `👤 Cliente: ${reservaData.nombre}\n` +
+                `📱 Celular: ${reservaData.celular}\n` +
+                `🏙️ Ciudad: ${reservaData.ciudad}\n` +
+                `🎯 Cantidad: ${reservaData.cantidad} número${reservaData.cantidad > 1 ? 's' : ''}\n` +
+                `💰 Monto: $${reservaData.monto.toLocaleString('es-CO')}\n\n` +
+                `Adjunto comprobante de pago.`;
+    document.getElementById('whatsappBtn').href = `https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(msj)}`;
+  }
+
+  window.copyNumber = function() {
+    navigator.clipboard.writeText(NEQUI_NUMBER).then(() => {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', cargarDatosReserva);
+</script>
+</body>
+</html>
